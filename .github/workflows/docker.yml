@@ -12,7 +12,7 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: thiritin/identity
+  IMAGE_NAME: eurofurence/identity
 
 jobs:
   create-release:
