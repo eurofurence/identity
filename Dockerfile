@@ -1,4 +1,4 @@
-FROM dunglas/frankenphp:1.12-php8.4-bookworm as base
+FROM dunglas/frankenphp:1.13-php8.4-bookworm as base
 WORKDIR /app
 
 ENV COMPOSER_MEMORY_LIMIT=-1
@@ -29,7 +29,7 @@ RUN rm -f composer.lock composer.json && COMPOSER_ALLOW_SUPERUSER=1 composer req
 ######################################################
 # NodeJS Stage
 ######################################################
-FROM node:20-bookworm as vite
+FROM node:24-bookworm as vite
 WORKDIR /app
 COPY package.json package-lock.json tailwind.config.js vite.config.js postcss.config.js ./
 RUN npm install

@@ -8,7 +8,7 @@
     },
     "dependencies": {
         "github-markdown-css": "^5.7.0",
-        "md-editor-v3": "^4.21.3",
+        "md-editor-v3": "^7.1.0",
         "primeicons": "^7.0.0",
         "primevue": "^3.53.1",
         "quill": "^2.0.2"

@@ -1,4 +1,4 @@
-FROM registry.access.redhat.com/ubi9/ubi-minimal:9.7 AS php-base
+FROM registry.access.redhat.com/ubi9/ubi-minimal:9.8 AS php-base
 
 LABEL maintainer="ThunderAl <community@thunderal.net>" \
       org.opencontainers.image.authors="ThunderAl <community@thunderal.net>" \
@@ -16,7 +16,7 @@ ARG PHP_VERSION=8.2
 ARG PHP_PACKAGES="php-cli composer php-intl php-json php-mbstring php-mysqlnd php-opcache php-pdo php-gd php-redis php-xml php-swoole php-zip php-sodium php-bcmath"
 
 # nodejs version to be installed
-ARG NODE_VERSION=20
+ARG NODE_VERSION=24
 
 ENV TZ=UTC
 
@@ -36,7 +36,7 @@ RUN set -xe; \
       rpm -i remi-release.rpm; rm -f remi-release.rpm; \
     \
     echo "==> Installing c-ares (swoole requirement) from compatible repository"; \
-    wget -q "https://mirror.stream.centos.org/9-stream/BaseOS/$(uname -m)/os/Packages/c-ares-1.17.1-4.el9.$(uname -m).rpm" -O c-ares.rpm; \
+    wget -q "https://mirror.stream.centos.org/9-stream/BaseOS/$(uname -m)/os/Packages/c-ares-1.19.1-2.el9.$(uname -m).rpm" -O c-ares.rpm; \
       rpm -i --nodigest c-ares.rpm; rm -f c-ares.rpm; \
     \
     echo "==> Installing PHP $PHP_VERSION and extensions"; \
