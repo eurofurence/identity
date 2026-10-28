@@ -61,16 +61,16 @@ function submitEditTeamForm() {
 
 const staffMemberList = usePage().props.staffMemberList;
 
-const addUserForm = useForm('POST',route('staff.groups.members.store',{group: props.group.hashid}), {
+const addUserForm = useForm('post',route('staff.groups.members.store',{group: props.group.hashid}), {
     user_id: '',
     email: '',
 })
 
-const addTeamForm = useForm('POST',route('staff.groups.teams.store',{group: props.group.hashid}), {
+const addTeamForm = useForm('post',route('staff.groups.teams.store',{group: props.group.hashid}), {
     name: '',
 })
 
-const editTeamForm = useForm('PATCH', route('staff.groups.update', {group: props.group.hashid}), {
+const editTeamForm = useForm('patch', route('staff.groups.update', {group: props.group.hashid}), {
     name: props.group.name,
 })
 
@@ -183,7 +183,7 @@ const options = ref(['Staff List', 'Email']);
             <Button
                 size="small"
                 severity="danger"
-                @click="useForm('DELETE', route('staff.groups.destroy', {group: group.hashid}),{}).submit({
+                @click="useForm('delete', route('staff.groups.destroy', {group: group.hashid}),{}).submit({
                     preserveScroll: true,
                     onSuccess: () => {
                         confirmDeleteTeamDialog = false;
