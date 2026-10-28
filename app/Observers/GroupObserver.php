@@ -15,10 +15,10 @@ class GroupObserver
 {
     public function created(Group $group)
     {
-        if (! App::isProduction() && $group->type === GroupTypeEnum::Team && $group->parent?->nextcloud_folder_id) {
-            CreateGroupJob::dispatch($group, true, $group->parent->nextcloud_folder_id);
+        $group->load('parent');
 
-            return;
+        if (App::isProduction() && $group->type === GroupTypeEnum::Team && $group->parent?->nextcloud_folder_id) {
+            CreateGroupJob::dispatch($group, true, $group->parent->nextcloud_folder_id);
         }
 
         if (Auth::user()) {

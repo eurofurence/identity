@@ -4,15 +4,19 @@ namespace App\Services;
 
 use App\Models\Group;
 use App\Models\User;
+use Illuminate\Http\Client\Response;
 use Illuminate\Support\Facades\Http;
+use RuntimeException;
+use SimpleXMLElement;
 
 class NextcloudService
 {
     public static function createGroup($groupId)
     {
-        Http::nextcloud()->post('/ocs/v1.php/cloud/groups', [
+        // 102: the group already exists
+        self::ocs(Http::nextcloud()->post('/ocs/v1.php/cloud/groups', [
             'groupid' => $groupId,
-        ])->throw();
+        ]), [100, 102]);
 
         return $groupId;
     }
@@ -99,19 +103,18 @@ class NextcloudService
 
     public static function createFolder(string $folderName, string $groupId): int
     {
-        $response = Http::nextcloud()->post('apps/groupfolders/folders', [
+        $xml = self::ocs(Http::nextcloud()->post('apps/groupfolders/folders', [
             'mountpoint' => $folderName,
-        ])->throw();
-        $xml = simplexml_load_string($response->body());
+        ]));
 
         // enable acl for group (we have that enabled for all groups)
-        Http::nextcloud()->post("apps/groupfolders/folders/{$xml->data->id}/acl", [
+        self::ocs(Http::nextcloud()->post("apps/groupfolders/folders/{$xml->data->id}/acl", [
             'acl' => 1,
-        ])->throw();
+        ]));
         // add group to folder apps/groupfolders/folders/$folderId/groups/$groupId
-        Http::nextcloud()->post("apps/groupfolders/folders/{$xml->data->id}/groups", [
+        self::ocs(Http::nextcloud()->post("apps/groupfolders/folders/{$xml->data->id}/groups", [
             'group' => $groupId,
-        ])->throw();
+        ]));
 
         return (int) $xml->data->id;
     }
@@ -119,15 +122,27 @@ class NextcloudService
     // add group to folder
     public static function addGroupToFolder($folderId, $groupId)
     {
-        Http::nextcloud()->post("apps/groupfolders/folders/{$folderId}/groups", [
+        self::ocs(Http::nextcloud()->post("apps/groupfolders/folders/{$folderId}/groups", [
             'group' => $groupId,
-        ])->throw();
+        ]));
     }
 
     public static function renameFolder(int $folderId, string $folderName): void
     {
-        Http::nextcloud()->post("apps/groupfolders/folders/{$folderId}/mountpoint", [
+        self::ocs(Http::nextcloud()->post("apps/groupfolders/folders/{$folderId}/mountpoint", [
             'mountpoint' => $folderName,
-        ])->throw();
+        ]));
+    }
+
+    // OCS v1 and the groupfolders API (which has no v2 routes) answer errors with HTTP 200, so the OCS status code has to be checked too
+    private static function ocs(Response $response, array $okCodes = [100]): SimpleXMLElement
+    {
+        $response->throw();
+        $xml = simplexml_load_string($response->body());
+        if (! in_array((int) $xml->meta->statuscode, $okCodes, true)) {
+            throw new RuntimeException("Nextcloud OCS status {$xml->meta->statuscode}: {$xml->meta->message}");
+        }
+
+        return $xml;
     }
 }
