@@ -20,7 +20,7 @@ Route::prefix('auth')->name('auth.')->group(function () {
         'login.view'
     );
     Route::post('login', [LoginController::class, 'submit'])
-        ->middleware([HandlePrecognitiveRequests::class, 'throttle:5,1'])
+        ->middleware([HandlePrecognitiveRequests::class, 'throttle:login'])
         ->name('login.submit');
 
     Route::get('two-factor',
